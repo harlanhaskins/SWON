@@ -1,0 +1,11 @@
+[
+    "hello": "world",
+    "this": ["is", "SWON"],
+    "its": [
+        "aNewEncodingFormat": ["that", "uses"],
+        "swift": ["as", "the", "interchange", "format"]
+    ],
+    "productionReady": false,
+    "support": nil,
+    "bugs": 1_000_000
+]

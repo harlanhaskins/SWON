@@ -26,7 +26,10 @@ let package = Package(
             ]),
         .testTarget(
             name: "SWONTests",
-            dependencies: ["SWON"]
+            dependencies: ["SWON"],
+            exclude: [
+                "Resources"
+            ]
         ),
     ]
 )
