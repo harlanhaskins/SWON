@@ -164,7 +164,7 @@ struct SWONWriter {
         case .float(let value):
             stream.write("\(value)")
         case .string(let value):
-            stream.write("\"\(value)\"")
+            stream.write("\"\(value.swonEscaped)\"")
         case .bool(let value):
             stream.write("\(value)")
         case .nil:

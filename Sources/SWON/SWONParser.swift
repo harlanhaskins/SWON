@@ -31,7 +31,7 @@ public enum SWONParser {
                 var dict = [String: SWONData]()
                 for element in elements {
                     let key = element.key
-                    guard let string = key.as(StringLiteralExprSyntax.self), let literalValue = string.stringLiteralValue else {
+                    guard let string = key.as(StringLiteralExprSyntax.self), let literalValue = string.representedLiteralValue else {
                         print("dictionary keys must be strings without interpolation")
                         continue
                     }
@@ -44,7 +44,7 @@ public enum SWONParser {
             }
         case .stringLiteralExpr:
             let literalExpr = node.as(StringLiteralExprSyntax.self)!
-            guard let stringLiteralValue = literalExpr.stringLiteralValue else {
+            guard let stringLiteralValue = literalExpr.representedLiteralValue else {
                 print("interpolation is not supported")
                 return nil
             }
@@ -79,17 +79,5 @@ public enum SWONParser {
             return nil
         }
         return parse(expr)
-    }
-}
-
-extension StringLiteralExprSyntax {
-    var stringLiteralValue: String? {
-        guard
-            segments.count == 1,
-            let stringSegment = segments.first?.as(StringSegmentSyntax.self)
-        else {
-            return nil
-        }
-        return stringSegment.content.text
     }
 }

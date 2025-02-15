@@ -1,3 +1,4 @@
+import Foundation
 import SwiftParser
 import SwiftSyntax
 
@@ -9,6 +10,33 @@ public enum SWONData: Equatable {
     case array([SWONData])
     case dictionary([String: SWONData])
     case `nil`
+}
+
+private func a(_ c: Character) -> UInt8 {
+    c.asciiValue!
+}
+
+public func jsonToSWON(_ data: Data) -> Data {
+    var data = data
+    struct Bracket {
+        var index: Int
+        var isDictionary: Bool = false
+    }
+    var isInString = false
+    for i in 0..<data.count {
+        if data[i] == a("\"") && i > 0 && data[i - 1] != a("\\") {
+            isInString.toggle()
+            continue
+        }
+
+        if isInString { continue }
+        if data[i] == a("{") {
+            data[i] = a("[")
+        } else if data[i] == a("}") {
+            data[i] = a("]")
+        }
+    }
+    return data
 }
 
 extension SWONData: ExpressibleByNilLiteral {

@@ -133,3 +133,14 @@ import SwiftSyntax
     let roundTrip = try SWONDecoder().decode(FoundationDataTypes.self, from: Data(output.utf8))
     #expect(roundTrip == data)
 }
+
+@Test func stringEscaping() throws {
+    let value = ["json": "{\n  \"hello\": \"world\"\n  }"]
+    let swon = try SWONEncoder().encode(value)
+    let roundTripped = try SWONDecoder().decode([String: String].self, from: swon)
+    #expect(roundTripped == value)
+
+    let innerJSON = try #require(roundTripped["json"])
+    let decoded = try JSONDecoder().decode( [String: String].self, from: Data(innerJSON.utf8))
+    #expect(decoded == ["hello": "world"])
+}
