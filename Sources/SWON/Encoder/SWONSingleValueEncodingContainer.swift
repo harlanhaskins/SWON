@@ -6,12 +6,13 @@
 //
 
 struct SWONSingleValueEncodingContainer: SingleValueEncodingContainer {
-    let codingPath: [CodingKey]
+    var codingPath: [CodingKey] {
+        encoder.codingPath
+    }
     let encoder: SWONEncoding
 
     init(encoder: SWONEncoding) {
         self.encoder = encoder
-        self.codingPath = encoder.codingPath
     }
 
     private mutating func encodeInteger<T: BinaryInteger>(_ value: T) throws {
@@ -36,6 +37,50 @@ struct SWONSingleValueEncodingContainer: SingleValueEncodingContainer {
 
     mutating func encode(_ value: Float) throws {
         encoder.storage = .float(Double(value))
+    }
+
+    mutating func encode<I: BinaryInteger>(value: I) throws {
+        encoder.storage = .integer(Int64(value))
+    }
+
+    mutating func encode(_ value: Int) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: Int8) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: Int16) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: Int32) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: Int64) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: UInt) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: UInt8) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: UInt16) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: UInt32) throws {
+        try encode(value: value)
+    }
+
+    mutating func encode(_ value: UInt64) throws {
+        try encode(value: value)
     }
 
     mutating func encode<T: Encodable>(_ value: T) throws {
@@ -69,8 +114,7 @@ struct SWONSingleValueEncodingContainer: SingleValueEncodingContainer {
         case let value as UInt64:
             encoder.storage = .integer(Int64(value))
         default:
-            let nestedEncoder = SWONEncoding()
-            nestedEncoder.codingPath = self.codingPath
+            let nestedEncoder = SWONEncoding(codingKey: nil, parent: encoder)
             try value.encode(to: nestedEncoder)
             encoder.storage = nestedEncoder.storage
         }

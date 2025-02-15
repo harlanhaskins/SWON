@@ -6,7 +6,6 @@
 //
 
 struct SWONKeyedEncodingContainer<K: CodingKey>: KeyedEncodingContainerProtocol {
-    
     let codingPath: [CodingKey]
     let encoder: SWONEncoding
 
@@ -53,8 +52,10 @@ struct SWONKeyedEncodingContainer<K: CodingKey>: KeyedEncodingContainerProtocol 
 
     mutating func encode<T: Encodable>(_ value: T, forKey key: K) throws {
         try encoder.withStorageAssumingDictionary { dict in
-            let nestedEncoder = SWONEncoding()
-            nestedEncoder.codingPath = self.codingPath + [key]
+            let nestedEncoder = SWONEncoding(
+                codingKey: .string(key.stringValue),
+                parent: encoder
+            )
             try value.encode(to: nestedEncoder)
             dict[key.stringValue] = nestedEncoder.storage
         }
@@ -62,20 +63,22 @@ struct SWONKeyedEncodingContainer<K: CodingKey>: KeyedEncodingContainerProtocol 
 
     mutating func nestedContainer<NestedKey: CodingKey>(keyedBy keyType: NestedKey.Type, forKey key: K) -> KeyedEncodingContainer<NestedKey> {
         encoder.withStorageAssumingDictionary { dict in
-            let nestedEncoder = SWONEncoding()
-            nestedEncoder.codingPath = self.codingPath + [key]
+            let nestedEncoder = SWONEncoding(
+                codingKey: .string(key.stringValue),
+                parent: encoder
+            )
             nestedEncoder.storage = .dictionary([:])
-            dict[key.stringValue] = nestedEncoder.storage
             return KeyedEncodingContainer(SWONKeyedEncodingContainer<NestedKey>(encoder: nestedEncoder))
         }
     }
 
     mutating func nestedUnkeyedContainer(forKey key: K) -> UnkeyedEncodingContainer {
         encoder.withStorageAssumingDictionary { dict in
-            let nestedEncoder = SWONEncoding()
-            nestedEncoder.codingPath = self.codingPath + [key]
+            let nestedEncoder = SWONEncoding(
+                codingKey: .string(key.stringValue),
+                parent: encoder
+            )
             nestedEncoder.storage = .array([])
-            dict[key.stringValue] = nestedEncoder.storage
             return SWONUnkeyedEncodingContainer(encoder: nestedEncoder)
         }
     }

@@ -9,6 +9,17 @@ final class SWONDecoding: Decoder {
         self.data = data
     }
 
+    func withCurrentKey<T, E: Error>(
+        _ key: some CodingKey,
+        perform action: () throws(E) -> T
+    ) throws(E) -> T {
+        codingPath.append(key)
+        defer {
+            codingPath.removeLast()
+        }
+        return try action()
+    }
+
     func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
         let container = SWONKeyedDecodingContainer<Key>(decoder: self, data: data)
         return KeyedDecodingContainer(container)

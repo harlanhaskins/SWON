@@ -13,11 +13,29 @@ extension SWONData {
     }
 }
 
+@usableFromInline
 struct SWONWriter {
+    @usableFromInline
     struct Options {
+        @usableFromInline
         var indentation: Int = 4
+
+        @usableFromInline
         var prettyPrint: Bool = true
+
+        @usableFromInline
         var sortKeys: Bool = false
+
+        @inlinable
+        init(
+            indentation: Int = 4,
+            prettyPrint: Bool = true,
+            sortKeys: Bool = false
+        ) {
+            self.indentation = indentation
+            self.prettyPrint = prettyPrint
+            self.sortKeys = sortKeys
+        }
     }
     var indent: String
     var options: Options
@@ -27,6 +45,7 @@ struct SWONWriter {
         self.indent = options.indentation == 0 ? "" : String(repeating: " ", count: options.indentation)
     }
 
+    @usableFromInline
     static func dump(_ data: SWONData, options: Options = .init()) -> String {
         var s = ""
         let writer = SWONWriter(options: options)

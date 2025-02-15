@@ -146,37 +146,36 @@ struct SWONKeyedDecodingContainer<K: CodingKey>: KeyedDecodingContainerProtocol 
     }
 
     func decode<T: Decodable>(_ type: T.Type, forKey key: K) throws -> T {
-        let value = try retrieve(key)
+        try decoder.withCurrentKey(key) {
+            let value = try retrieve(key)
+            let nestedDecoder = SWONDecoding(data: value)
+            nestedDecoder.codingPath = decoder.codingPath
 
-        decoder.codingPath.append(key)
-        defer { decoder.codingPath.removeLast() }
-
-        let nestedDecoder = SWONDecoding(data: value)
-        nestedDecoder.codingPath = decoder.codingPath
-
-        return try T(from: nestedDecoder)
+            return try T(from: nestedDecoder)
+        }
     }
 
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
-        decoder.codingPath.append(key)
-        defer { decoder.codingPath.removeLast() }
-
-        let value = try retrieve(key)
-        let container = SWONKeyedDecodingContainer<NestedKey>(decoder: decoder, data: value)
-        return KeyedDecodingContainer(container)
+    func nestedContainer<NestedKey>(
+        keyedBy type: NestedKey.Type,
+        forKey key: K
+    ) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+        try decoder.withCurrentKey(key) {
+            let value = try retrieve(key)
+            let container = SWONKeyedDecodingContainer<NestedKey>(decoder: decoder, data: value)
+            return KeyedDecodingContainer(container)
+        }
     }
 
     func nestedUnkeyedContainer(forKey key: K) throws -> UnkeyedDecodingContainer {
-        decoder.codingPath.append(key)
-        defer { decoder.codingPath.removeLast() }
+        try decoder.withCurrentKey(key) {
+            let value = try retrieve(key)
 
-        let value = try retrieve(key)
+            guard case .array(let array) = value else {
+                throw expected(typeName: "array", [Any].self, for: value)
+            }
 
-        guard case .array(let array) = value else {
-            throw expected(typeName: "array", [Any].self, for: value)
+            return SWONUnkeyedDecodingContainer(decoder: decoder, array: array)
         }
-
-        return SWONUnkeyedDecodingContainer(decoder: decoder, array: array)
     }
 
     func superDecoder() throws -> Decoder {
@@ -184,10 +183,9 @@ struct SWONKeyedDecodingContainer<K: CodingKey>: KeyedDecodingContainerProtocol 
     }
 
     func superDecoder(forKey key: K) throws -> Decoder {
-        decoder.codingPath.append(key)
-        defer { decoder.codingPath.removeLast() }
-
-        let value = try retrieve(key)
-        return SWONDecoding(data: value)
+        try decoder.withCurrentKey(key) {
+            let value = try retrieve(key)
+            return SWONDecoding(data: value)
+        }
     }
 }

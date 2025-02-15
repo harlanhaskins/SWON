@@ -99,6 +99,7 @@ import SwiftSyntax
         ["World": 9900]
     ])
     var encoder = SWONEncoder()
+    encoder.prettyPrint = true
     encoder.sortKeys = true
 
     let prettyOutput: String = try encoder.encode(content)

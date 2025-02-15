@@ -11,9 +11,10 @@ let package = Package(
         .library(
             name: "SWON",
             targets: ["SWON"]),
+        .executable(name: "SWONTester", targets: ["SWONTester"])
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1")
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -31,5 +32,11 @@ let package = Package(
                 "Resources"
             ]
         ),
+        .executableTarget(
+            name: "SWONTester",
+            dependencies: [
+                "SWON"
+            ]
+        )
     ]
 )
